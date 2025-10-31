@@ -2,6 +2,7 @@
 import { GeminiService } from './gemini-service.js';
 import { Utils } from './utils.js';
 import { Modal } from './modal.js';
+import { config } from './config.js';
 
 export class App {
     constructor() {
