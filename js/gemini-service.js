@@ -44,10 +44,47 @@ export class GeminiService {
     }
 
     static getAvailableModels() {
-        return Object.entries(config.MODELS).map(([id, model]) => ({
+        const models = Object.entries(config.MODELS).map(([id, model]) => ({
             id,
             name: model.name,
             description: model.description
         }));
+
+        console.log('Available models from config:', models);
+        return models;
+    }
+
+    static async testModelAvailability(modelId) {
+        const modelConfig = config.MODELS[modelId];
+        if (!modelConfig) {
+            console.error(`Model ${modelId} not found in configuration`);
+            return false;
+        }
+
+        try {
+            const testPayload = {
+                contents: [{ parts: [{ text: "test" }] }],
+                systemInstruction: {
+                    parts: [{ text: "test" }]
+                },
+            };
+
+            const response = await fetch(`${modelConfig.url}?key=${config.API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(testPayload),
+            });
+
+            if (!response.ok) {
+                console.error(`Model ${modelId} not available:`, response.status, response.statusText);
+                return false;
+            }
+
+            const result = await response.json();
+            return !!result.candidates?.[0]?.content;
+        } catch (error) {
+            console.error(`Error testing model ${modelId}:`, error);
+            return false;
+        }
     }
 }

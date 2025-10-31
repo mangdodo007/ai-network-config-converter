@@ -401,12 +401,18 @@ For each part of the configuration, create a heading. Under each heading, list t
         const models = GeminiService.getAvailableModels();
         console.log('Available models:', models);
 
+        if (models.length === 0) {
+            console.error('No models available');
+            this.modelSelectionEl.innerHTML = '<option value="">No models available</option>';
+            return;
+        }
+
         this.modelSelectionEl.innerHTML = '';
 
         models.forEach(model => {
             const option = document.createElement('option');
             option.value = model.id;
-            option.textContent = model.name;
+            option.textContent = `${model.name} - ${model.description}`;
             if (model.id === config.DEFAULT_MODEL) {
                 option.selected = true;
             }
@@ -414,6 +420,7 @@ For each part of the configuration, create a heading. Under each heading, list t
         });
 
         console.log('Model selection populated with', models.length, 'models');
+        console.log('Selected model:', this.modelSelectionEl.value);
     }
 
     updateModelDescription() {
