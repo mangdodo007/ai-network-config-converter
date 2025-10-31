@@ -4,7 +4,7 @@ REM Created by Lindo Prasetyo
 REM This script starts a local web server and opens the application in your default browser
 REM Features: Multi-vendor network config translation with AI-powered analysis
 
-set PORT=8000
+set PORT=8888
 set APP_URL=http://localhost:%PORT%
 set APP_VERSION=v1.1.0
 

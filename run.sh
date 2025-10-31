@@ -5,7 +5,7 @@
 # This script starts a local web server and opens the application in your default browser
 # Features: Multi-vendor network config translation with AI-powered analysis
 
-PORT=8000
+PORT=8888
 APP_URL="http://localhost:$PORT"
 APP_VERSION="v1.1.0"
 

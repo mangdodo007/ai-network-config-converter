@@ -13,7 +13,7 @@ import time
 app = Flask(__name__)
 
 # Configuration
-PORT = 8000
+PORT = 8888
 HOST = '0.0.0.0'
 
 @app.route('/')
