@@ -38,8 +38,11 @@
                         <div>
                             <label for="modelSelection" class="block text-sm font-medium text-gray-300 mb-2">AI Model Selection</label>
                             <select id="modelSelection" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-3">
-                                <option value="">Loading models...</option>
-                                <!-- Models will be populated by JavaScript -->
+                                <option value="gemini-1.5-flash" selected>Gemini 1.5 Flash (Recommended)</option>
+                                <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+                                <option value="gemini-1.5-flash-8b">Gemini 1.5 Flash (8B)</option>
+                                <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash (Experimental)</option>
+                                <!-- Additional models will be added by JavaScript -->
                             </select>
                             <p id="modelDescription" class="mt-1 text-xs text-gray-400"></p>
                         </div>

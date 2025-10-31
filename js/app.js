@@ -411,28 +411,41 @@ For each part of the configuration, create a heading. Under each heading, list t
     }
 
     populateModelSelection() {
-        console.log('Populating model selection...');
+        console.log('=== POPULATING MODEL SELECTION ===');
 
         if (!this.modelSelectionEl) {
             console.error('Model selection element not found');
             return;
         }
 
-        const models = GeminiService.getAvailableModels();
-        console.log('Available models:', models);
+        // First try: Use service method
+        try {
+            const models = GeminiService.getAvailableModels();
+            console.log('Models from service:', models);
 
-        if (models.length === 0) {
-            console.error('No models available');
-            this.modelSelectionEl.innerHTML = '<option value="">No models available</option>';
-            return;
+            if (models && models.length > 0) {
+                this.populateModelsFromList(models);
+                return;
+            }
+        } catch (error) {
+            console.error('Error getting models from service:', error);
         }
+
+        // Fallback: Manually create models from config
+        console.log('Using fallback manual model creation...');
+        this.populateModelsManually();
+    }
+
+    populateModelsFromList(models) {
+        console.log('Populating from list:', models);
 
         this.modelSelectionEl.innerHTML = '';
 
-        models.forEach(model => {
+        models.forEach((model, index) => {
+            console.log(`Adding model ${index}:`, model);
             const option = document.createElement('option');
             option.value = model.id;
-            option.textContent = `${model.name} - ${model.description}`;
+            option.textContent = model.name;
             if (model.id === config.DEFAULT_MODEL) {
                 option.selected = true;
             }
@@ -440,7 +453,43 @@ For each part of the configuration, create a heading. Under each heading, list t
         });
 
         console.log('Model selection populated with', models.length, 'models');
-        console.log('Selected model:', this.modelSelectionEl.value);
+        console.log('Current options count:', this.modelSelectionEl.options.length);
+        console.log('Selected value:', this.modelSelectionEl.value);
+    }
+
+    populateModelsManually() {
+        console.log('Manual population starting...');
+
+        this.modelSelectionEl.innerHTML = '';
+
+        // Manual model definitions
+        const manualModels = [
+            { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash (Recommended)' },
+            { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
+            { id: 'gemini-1.5-flash-8b', name: 'Gemini 1.5 Flash (8B)' },
+            { id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash (Experimental)' }
+        ];
+
+        manualModels.forEach((model, index) => {
+            console.log(`Adding manual model ${index}:`, model);
+            const option = document.createElement('option');
+            option.value = model.id;
+            option.textContent = model.name;
+            if (model.id === config.DEFAULT_MODEL) {
+                option.selected = true;
+                console.log('Set as default:', model.id);
+            }
+            this.modelSelectionEl.appendChild(option);
+        });
+
+        console.log('Manual population complete');
+        console.log('Final options count:', this.modelSelectionEl.options.length);
+        console.log('Final selected value:', this.modelSelectionEl.value);
+
+        // Verify the options
+        for (let i = 0; i < this.modelSelectionEl.options.length; i++) {
+            console.log(`Option ${i}:`, this.modelSelectionEl.options[i].value, this.modelSelectionEl.options[i].textContent);
+        }
     }
 
     updateModelDescription() {
@@ -517,3 +566,15 @@ For each part of the configuration, create a heading. Under each heading, list t
 
 // Make test function available globally
 window.testApp = () => App.testFromConsole();
+
+// Manual model population function - call from browser console: window.populateModels()
+window.populateModels = () => {
+    const modelSelect = document.getElementById('modelSelection');
+    if (modelSelect) {
+        console.log('Manual model population called');
+        const app = new App();
+        app.populateModelSelection();
+    } else {
+        console.error('Model selection element not found');
+    }
+};
