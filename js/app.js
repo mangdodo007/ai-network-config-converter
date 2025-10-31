@@ -160,16 +160,35 @@ export class App {
         }
 
         let customPromptSection = '';
+        let priorityInstructions = '';
+
         if (customPrompt) {
-            customPromptSection = `\n\nAdditional Instructions: ${customPrompt}`;
+            // Make custom prompt more prominent and put it first
+            customPromptSection = `
+## CUSTOM INSTRUCTIONS - PRIORITY #1
+${customPrompt}
+
+⚠️ IMPORTANT: The custom instructions above MUST be followed EXACTLY. They override any standard rules if there are conflicts. Pay special attention to:
+- Documentation links provided
+- Example translations shown
+- Specific formatting requirements mentioned
+- Any vendor-specific nuances highlighted`;
         }
 
-        return `You are 'Gem Network Expert Translate', a highly specialized AI agent. Your sole purpose is to translate network device configurations. You have expert-level knowledge of multi-vendor syntax, including Cisco IOS, IOS-XE, IOS-XR, NX-OS, Juniper (Junos), Huawei (VRP), Aruba (AOS-CX), and Arista (EOS).${contextInfo}${customPromptSection}
+        return `You are 'Gem Network Expert Translate', a highly specialized AI agent. Your sole purpose is to translate network device configurations using the provided custom instructions with highest priority.
+
+${customPromptSection}
+
+## BASE INSTRUCTIONS - PRIORITY #2 (Follow only if custom instructions don't specify)
+You have expert-level knowledge of multi-vendor syntax, including Cisco IOS, IOS-XE, IOS-XR, NX-OS, Juniper (Junos), Huawei (VRP), Aruba (AOS-CX), and Arista (EOS).${contextInfo}
+
 Core Directives:
-1. Analyze the source configuration and any corrective feedback provided by the user.
-2. Translate the configuration into the target vendor's syntax with extreme accuracy.
+1. **FIRST PRIORITY**: Follow all custom instructions exactly as specified above.
+2. **SECOND PRIORITY**: If custom instructions don't cover something, use these standard rules:
+   - Analyze the source configuration and any corrective feedback provided by the user.
+   - Translate the configuration into the target vendor's syntax with extreme accuracy.
 3. **Critical Output Format**: Your response MUST BE ONLY the translated configuration code. Do not include any explanatory text, greetings, or markdown formatting like \`\`\`. The output must be pure, ready-to-use configuration code.
-4. **Critical Formatting Requirements**: You MUST follow these exact formatting rules for each vendor:
+4. **Critical Formatting Requirements**: Follow custom instructions first, then these standard rules for each vendor:
    - **Cisco IOS/IOS-XE/NX-OS**: Use 1 space indentation for sub-commands under parent commands. Example format:
      interface Ethernet1/1
       description Uplink
@@ -201,20 +220,36 @@ Core Directives:
     buildExplanationPrompt(customPrompt = '') {
         let customPromptSection = '';
         if (customPrompt) {
-            customPromptSection = `\n\nAdditional Context: ${customPrompt}`;
+            customPromptSection = `
+## CUSTOM INSTRUCTIONS - PRIORITY #1
+${customPrompt}
+
+⚠️ IMPORTANT: The custom instructions above MUST be followed EXACTLY. They override any standard rules if there are conflicts.`;
         }
 
-        return `You are a senior network engineer and trainer. Your task is to provide a clear, step-by-step explanation for a given network configuration.${customPromptSection}
+        return `You are a senior network engineer and trainer. Your task is to provide a clear, step-by-step explanation for a given network configuration.
+
+${customPromptSection}
+
+## BASE INSTRUCTIONS - PRIORITY #2 (Follow only if custom instructions don't specify)
 **Format your entire response using Markdown.** Use headings (e.g., '## Interface Configuration'), bullet points for explanations, and backticks for inline code (e.g., \`vlan 10\`) or triple backticks with a language specifier for code blocks.`;
     }
 
     buildTestPlanPrompt(customPrompt = '') {
         let customPromptSection = '';
         if (customPrompt) {
-            customPromptSection = `\n\nAdditional Requirements: ${customPrompt}`;
+            customPromptSection = `
+## CUSTOM INSTRUCTIONS - PRIORITY #1
+${customPrompt}
+
+⚠️ IMPORTANT: The custom instructions above MUST be followed EXACTLY. They override any standard rules if there are conflicts.`;
         }
 
-        return `You are a network automation engineer specializing in quality assurance. Your task is to create a concise but effective test plan to verify a network configuration.${customPromptSection}
+        return `You are a network automation engineer specializing in quality assurance. Your task is to create a concise but effective test plan to verify a network configuration.
+
+${customPromptSection}
+
+## BASE INSTRUCTIONS - PRIORITY #2 (Follow only if custom instructions don't specify)
 **Format the entire response using Markdown, including tables for verification commands.**
 For each part of the configuration, create a heading. Under each heading, list the specific verification commands (e.g., 'show' commands) and describe the expected output in a table to confirm success.`;
     }
