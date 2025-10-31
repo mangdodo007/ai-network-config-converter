@@ -132,3 +132,55 @@ textarea::-webkit-scrollbar-thumb:hover, pre::-webkit-scrollbar-thumb:hover, .mo
     font-weight: 600;
     color: #e2e8f0;
 }
+
+/* Advanced Settings Animations */
+#advancedSettings {
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+#advancedSettings.hidden {
+    max-height: 0;
+    opacity: 0;
+    margin: 0;
+}
+
+#advancedSettings:not(.hidden) {
+    max-height: 1000px;
+    opacity: 1;
+}
+
+/* Custom Prompt Textarea Styling */
+#customPrompt {
+    resize: vertical;
+    min-height: 100px;
+}
+
+#customPrompt:focus {
+    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+}
+
+/* Model Selection Styling */
+#modelSelection:focus {
+    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+}
+
+/* Advanced Settings Toggle Button */
+#toggleAdvanced {
+    transition: all 0.2s ease;
+}
+
+#toggleAdvanced:hover {
+    transform: translateY(-1px);
+}
+
+/* Character Counter Styling */
+.text-red-400 {
+    color: #f87171;
+}
+
+/* Clear Custom Prompt Button */
+#clearCustomPrompt:hover {
+    color: #ef4444;
+    text-decoration: underline;
+}

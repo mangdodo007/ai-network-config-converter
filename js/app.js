@@ -22,6 +22,16 @@ export class App {
         this.aiFeaturesContainer = document.getElementById('aiFeatures');
         this.explainButton = document.getElementById('explainButton');
         this.testPlanButton = document.getElementById('testPlanButton');
+
+        // Advanced settings elements
+        this.toggleAdvancedBtn = document.getElementById('toggleAdvanced');
+        this.advancedSettingsEl = document.getElementById('advancedSettings');
+        this.advancedToggleTextEl = document.getElementById('advancedToggleText');
+        this.modelSelectionEl = document.getElementById('modelSelection');
+        this.modelDescriptionEl = document.getElementById('modelDescription');
+        this.customPromptEl = document.getElementById('customPrompt');
+        this.clearCustomPromptBtn = document.getElementById('clearCustomPrompt');
+        this.customPromptLengthEl = document.getElementById('customPromptLength');
     }
 
     setupEventListeners() {
@@ -29,12 +39,19 @@ export class App {
         this.explainButton.addEventListener('click', () => this.handleExplain());
         this.testPlanButton.addEventListener('click', () => this.handleTestPlan());
 
+        // Advanced settings event listeners
+        this.toggleAdvancedBtn.addEventListener('click', () => this.toggleAdvancedSettings());
+        this.modelSelectionEl.addEventListener('change', () => this.updateModelDescription());
+        this.customPromptEl.addEventListener('input', () => this.updateCustomPromptLength());
+        this.clearCustomPromptBtn.addEventListener('click', () => this.clearCustomPrompt());
+
         // Add vendor change listeners for OS filtering
         this.sourceVendorEl.addEventListener('change', () => this.updateSourceOSOptions());
         this.targetVendorEl.addEventListener('change', () => this.updateTargetOSOptions());
 
-        // Initialize OS filtering on load
+        // Initialize advanced settings and OS filtering on load
         setTimeout(() => {
+            this.initializeAdvancedSettings();
             this.updateSourceOSOptions();
             this.updateTargetOSOptions();
         }, 100);
@@ -46,6 +63,8 @@ export class App {
         const sourceOSType = this.sourceOSTypeEl.value;
         const targetVendor = this.targetVendorEl.value;
         const targetOSType = this.targetOSTypeEl.value;
+        const selectedModel = this.modelSelectionEl.value;
+        const customPrompt = this.customPromptEl.value.trim();
 
         if (!sourceConfig) {
             this.outputContainer.innerHTML = '<span class="text-red-400">Please enter a source configuration.</span>';
@@ -58,10 +77,10 @@ export class App {
         this.translateButton.classList.add('opacity-50', 'cursor-not-allowed');
 
         try {
-            const systemPrompt = this.buildTranslationPrompt(sourceVendor, sourceOSType, targetOSType);
+            const systemPrompt = this.buildTranslationPrompt(sourceVendor, sourceOSType, targetOSType, customPrompt);
             const userQuery = this.buildTranslationQuery(sourceConfig, sourceVendor, sourceOSType, targetVendor, targetOSType);
 
-            const translatedConfig = await GeminiService.generateContent(systemPrompt, userQuery);
+            const translatedConfig = await GeminiService.generateContent(systemPrompt, userQuery, selectedModel);
             const cleanedConfig = Utils.cleanApiResponse(translatedConfig);
             this.lastTranslatedConfig = cleanedConfig;
 
@@ -80,13 +99,15 @@ export class App {
     async handleExplain() {
         if (!this.lastTranslatedConfig) return;
         const targetVendor = this.targetVendorEl.value;
+        const selectedModel = this.modelSelectionEl.value;
+        const customPrompt = this.customPromptEl.value.trim();
         this.modal.open('Configuration Explanation');
 
         try {
-            const systemPrompt = this.buildExplanationPrompt();
+            const systemPrompt = this.buildExplanationPrompt(customPrompt);
             const userQuery = `Explain the following ${targetVendor} configuration:\n\n${this.lastTranslatedConfig}`;
-            
-            const rawExplanation = await GeminiService.generateContent(systemPrompt, userQuery);
+
+            const rawExplanation = await GeminiService.generateContent(systemPrompt, userQuery, selectedModel);
             const cleanedExplanation = Utils.cleanApiResponse(rawExplanation);
             this.modal.setContent(cleanedExplanation);
         } catch (error) {
@@ -97,13 +118,15 @@ export class App {
     async handleTestPlan() {
         if (!this.lastTranslatedConfig) return;
         const targetVendor = this.targetVendorEl.value;
+        const selectedModel = this.modelSelectionEl.value;
+        const customPrompt = this.customPromptEl.value.trim();
         this.modal.open('Generated Test Plan');
-        
+
         try {
-            const systemPrompt = this.buildTestPlanPrompt();
+            const systemPrompt = this.buildTestPlanPrompt(customPrompt);
             const userQuery = `Generate a test plan for the following ${targetVendor} configuration:\n\n${this.lastTranslatedConfig}`;
-            
-            const rawTestPlan = await GeminiService.generateContent(systemPrompt, userQuery);
+
+            const rawTestPlan = await GeminiService.generateContent(systemPrompt, userQuery, selectedModel);
             const cleanedTestPlan = Utils.cleanApiResponse(rawTestPlan);
             this.modal.setContent(cleanedTestPlan);
         } catch (error) {
@@ -111,7 +134,7 @@ export class App {
         }
     }
 
-    buildTranslationPrompt(sourceVendor = '', sourceOSType = '', targetOSType = '') {
+    buildTranslationPrompt(sourceVendor = '', sourceOSType = '', targetOSType = '', customPrompt = '') {
         let contextInfo = '';
         if (sourceVendor) {
             contextInfo += ` The source configuration is from ${sourceVendor}.`;
@@ -123,7 +146,12 @@ export class App {
             contextInfo += ` The target OS is ${targetOSType}.`;
         }
 
-        return `You are 'Gem Network Expert Translate', a highly specialized AI agent. Your sole purpose is to translate network device configurations. You have expert-level knowledge of multi-vendor syntax, including Cisco IOS, IOS-XE, IOS-XR, NX-OS, Juniper (Junos), Huawei (VRP), Aruba (AOS-CX), and Arista (EOS).${contextInfo}
+        let customPromptSection = '';
+        if (customPrompt) {
+            customPromptSection = `\n\nAdditional Instructions: ${customPrompt}`;
+        }
+
+        return `You are 'Gem Network Expert Translate', a highly specialized AI agent. Your sole purpose is to translate network device configurations. You have expert-level knowledge of multi-vendor syntax, including Cisco IOS, IOS-XE, IOS-XR, NX-OS, Juniper (Junos), Huawei (VRP), Aruba (AOS-CX), and Arista (EOS).${contextInfo}${customPromptSection}
 Core Directives:
 1. Analyze the source configuration and any corrective feedback provided by the user.
 2. Translate the configuration into the target vendor's syntax with extreme accuracy.
@@ -157,13 +185,23 @@ Core Directives:
 5. If a direct translation is impossible, embed a clear, concise comment within the code (e.g., "# [INFO] Manual configuration required for this feature").`;
     }
 
-    buildExplanationPrompt() {
-        return `You are a senior network engineer and trainer. Your task is to provide a clear, step-by-step explanation for a given network configuration. 
+    buildExplanationPrompt(customPrompt = '') {
+        let customPromptSection = '';
+        if (customPrompt) {
+            customPromptSection = `\n\nAdditional Context: ${customPrompt}`;
+        }
+
+        return `You are a senior network engineer and trainer. Your task is to provide a clear, step-by-step explanation for a given network configuration.${customPromptSection}
 **Format your entire response using Markdown.** Use headings (e.g., '## Interface Configuration'), bullet points for explanations, and backticks for inline code (e.g., \`vlan 10\`) or triple backticks with a language specifier for code blocks.`;
     }
 
-    buildTestPlanPrompt() {
-        return `You are a network automation engineer specializing in quality assurance. Your task is to create a concise but effective test plan to verify a network configuration. 
+    buildTestPlanPrompt(customPrompt = '') {
+        let customPromptSection = '';
+        if (customPrompt) {
+            customPromptSection = `\n\nAdditional Requirements: ${customPrompt}`;
+        }
+
+        return `You are a network automation engineer specializing in quality assurance. Your task is to create a concise but effective test plan to verify a network configuration.${customPromptSection}
 **Format the entire response using Markdown, including tables for verification commands.**
 For each part of the configuration, create a heading. Under each heading, list the specific verification commands (e.g., 'show' commands) and describe the expected output in a table to confirm success.`;
     }
@@ -282,5 +320,73 @@ For each part of the configuration, create a heading. Under each heading, list t
             'EOS': 'Arista EOS'
         };
         return displayNames[osType] || osType;
+    }
+
+    // Advanced Settings Methods
+    initializeAdvancedSettings() {
+        this.populateModelSelection();
+        this.updateModelDescription();
+        this.updateCustomPromptLength();
+    }
+
+    toggleAdvancedSettings() {
+        const isHidden = this.advancedSettingsEl.classList.contains('hidden');
+
+        if (isHidden) {
+            this.advancedSettingsEl.classList.remove('hidden');
+            this.advancedToggleTextEl.textContent = 'Hide';
+            this.toggleAdvancedBtn.innerHTML = '<span class="mr-1">▲</span><span id="advancedToggleText">Hide</span>';
+        } else {
+            this.advancedSettingsEl.classList.add('hidden');
+            this.advancedToggleTextEl.textContent = 'Show';
+            this.toggleAdvancedBtn.innerHTML = '<span class="mr-1">▼</span><span id="advancedToggleText">Show</span>';
+        }
+    }
+
+    populateModelSelection() {
+        const models = GeminiService.getAvailableModels();
+        this.modelSelectionEl.innerHTML = '';
+
+        models.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model.id;
+            option.textContent = model.name;
+            if (model.id === config.DEFAULT_MODEL) {
+                option.selected = true;
+            }
+            this.modelSelectionEl.appendChild(option);
+        });
+    }
+
+    updateModelDescription() {
+        const selectedModelId = this.modelSelectionEl.value;
+        const modelConfig = config.MODELS[selectedModelId];
+
+        if (modelConfig) {
+            this.modelDescriptionEl.textContent = modelConfig.description;
+        } else {
+            this.modelDescriptionEl.textContent = '';
+        }
+    }
+
+    updateCustomPromptLength() {
+        const length = this.customPromptEl.value.length;
+        const maxLength = 2000;
+
+        this.customPromptLengthEl.textContent = `${length} / ${maxLength} characters`;
+
+        if (length > maxLength) {
+            this.customPromptLengthEl.classList.add('text-red-400');
+            this.customPromptLengthEl.classList.remove('text-gray-500');
+            this.customPromptEl.value = this.customPromptEl.value.substring(0, maxLength);
+        } else {
+            this.customPromptLengthEl.classList.remove('text-red-400');
+            this.customPromptLengthEl.classList.add('text-gray-500');
+        }
+    }
+
+    clearCustomPrompt() {
+        this.customPromptEl.value = '';
+        this.updateCustomPromptLength();
     }
 }

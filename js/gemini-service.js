@@ -2,7 +2,12 @@
 import { config } from './config.js';
 
 export class GeminiService {
-    static async generateContent(systemPrompt, userQuery) {
+    static async generateContent(systemPrompt, userQuery, modelId = config.DEFAULT_MODEL) {
+        const modelConfig = config.MODELS[modelId];
+        if (!modelConfig) {
+            throw new Error(`Invalid model ID: ${modelId}`);
+        }
+
         const payload = {
             contents: [{ parts: [{ text: userQuery }] }],
             systemInstruction: {
@@ -11,7 +16,7 @@ export class GeminiService {
         };
 
         try {
-            const response = await fetch(`${config.API_URL}?key=${config.API_KEY}`, {
+            const response = await fetch(`${modelConfig.url}?key=${config.API_KEY}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -36,5 +41,13 @@ export class GeminiService {
             console.error('Error in GeminiService.generateContent:', error);
             throw error;
         }
+    }
+
+    static getAvailableModels() {
+        return Object.entries(config.MODELS).map(([id, model]) => ({
+            id,
+            name: model.name,
+            description: model.description
+        }));
     }
 }

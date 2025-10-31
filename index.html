@@ -23,6 +23,47 @@
             <!-- Single Column Layout for Better UX Flow -->
             <div class="max-w-4xl mx-auto space-y-8">
 
+                <!-- Advanced Settings Section -->
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="flex-shrink-0 w-8 h-8 bg-purple-600 text-white rounded-full flex items-center justify-center text-sm font-medium">⚙</div>
+                        <h2 class="text-lg font-semibold text-white">Advanced Settings</h2>
+                        <button id="toggleAdvanced" class="ml-auto text-sm text-gray-400 hover:text-white transition-colors">
+                            <span id="advancedToggleText">Show</span>
+                        </button>
+                    </div>
+
+                    <div id="advancedSettings" class="ml-10 space-y-4 hidden">
+                        <!-- Model Selection -->
+                        <div>
+                            <label for="modelSelection" class="block text-sm font-medium text-gray-300 mb-2">AI Model Selection</label>
+                            <select id="modelSelection" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-purple-500 focus:border-purple-500 block w-full p-3">
+                                <!-- Models will be populated by JavaScript -->
+                            </select>
+                            <p id="modelDescription" class="mt-1 text-xs text-gray-400"></p>
+                        </div>
+
+                        <!-- Custom Prompt Section -->
+                        <div>
+                            <label for="customPrompt" class="block text-sm font-medium text-gray-300 mb-2">
+                                Custom System Prompt
+                                <span class="text-gray-500 text-xs">(Optional - Add documentation links, examples, or specific instructions)</span>
+                            </label>
+                            <textarea id="customPrompt" rows="4" class="code-font block w-full bg-gray-900 border border-gray-600 rounded-lg p-3 text-sm text-blue-300 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-shadow duration-200" placeholder="Example:
+For reference, use this Cisco documentation: https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/security/s1/sec-s1.html
+Use this translation example as a reference:
+- interface GigabitEthernet0/0/0 → set interfaces ge-0/0/0
+- switchport mode trunk → set interfaces ge-0/0/0 unit 0 family ethernet-switching port-mode trunk"></textarea>
+                            <div class="mt-2 flex items-center space-x-4">
+                                <button id="clearCustomPrompt" class="text-xs text-gray-400 hover:text-white transition-colors">
+                                    Clear Custom Prompt
+                                </button>
+                                <span id="customPromptLength" class="text-xs text-gray-500">0 / 2000 characters</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Step 1: Source Configuration -->
                 <div class="space-y-4">
                     <div class="flex items-center space-x-2">
