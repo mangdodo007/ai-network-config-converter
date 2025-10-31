@@ -1,6 +1,6 @@
 // Configuration and constants
 export const config = {
-    API_KEY: 'AIzaSyDSOwAGCX6ufWBdx0_ptTrhCY9aW1wmArM', // Add your API key here
+    API_KEY: 'your-api-key-here', // Replace with your Gemini API key
     // Available models configuration
     MODELS: {
         'gemini-2.5-pro': {

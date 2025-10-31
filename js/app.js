@@ -2,14 +2,18 @@
 import { GeminiService } from './gemini-service.js';
 import { Utils } from './utils.js';
 import { Modal } from './modal.js';
+import { UpdateService } from './update-service.js';
 import { config } from './config.js';
 
 export class App {
     constructor() {
         this.initializeElements();
         this.modal = new Modal();
+        this.updateService = new UpdateService();
+        this.availableUpdate = null;
         this.setupEventListeners();
         this.lastTranslatedConfig = '';
+        this.initializeUpdateCheck();
     }
 
     initializeElements() {
@@ -34,6 +38,12 @@ export class App {
         this.customPromptEl = document.getElementById('customPrompt');
         this.clearCustomPromptBtn = document.getElementById('clearCustomPrompt');
         this.customPromptLengthEl = document.getElementById('customPromptLength');
+
+        // Update elements
+        this.checkUpdateBtn = document.getElementById('checkUpdateBtn');
+        this.updateBtn = document.getElementById('updateBtn');
+        this.updateStatus = document.getElementById('updateStatus');
+        this.currentVersion = document.getElementById('currentVersion');
     }
 
     setupEventListeners() {
@@ -61,6 +71,14 @@ export class App {
         // Add vendor change listeners for OS filtering
         this.sourceVendorEl.addEventListener('change', () => this.updateSourceOSOptions());
         this.targetVendorEl.addEventListener('change', () => this.updateTargetOSOptions());
+
+        // Update button listeners
+        if (this.checkUpdateBtn) {
+            this.checkUpdateBtn.addEventListener('click', () => this.checkForUpdates());
+        }
+        if (this.updateBtn) {
+            this.updateBtn.addEventListener('click', () => this.showUpdateSummary());
+        }
 
         // Initialize advanced settings and OS filtering on load
         setTimeout(() => {
@@ -478,6 +496,91 @@ For each part of the configuration, create a heading. Under each heading, list t
     clearCustomPrompt() {
         this.customPromptEl.value = '';
         this.updateCustomPromptLength();
+    }
+
+    // Update methods
+    async initializeUpdateCheck() {
+        // Set current version
+        if (this.currentVersion) {
+            this.currentVersion.textContent = `Current version: v${this.updateService.currentVersion}`;
+        }
+    }
+
+    async checkForUpdates() {
+        if (!this.checkUpdateBtn || !this.updateStatus) return;
+
+        this.updateStatus.textContent = 'Checking for updates...';
+        this.checkUpdateBtn.disabled = true;
+        this.checkUpdateBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+        try {
+            const updateInfo = await this.updateService.checkForUpdates();
+
+            if (updateInfo.error) {
+                this.updateStatus.textContent = 'Update check failed';
+                this.updateStatus.className = 'text-sm text-red-400';
+                return;
+            }
+
+            if (updateInfo.message) {
+                // Handle no releases case
+                this.updateStatus.textContent = updateInfo.message;
+                this.updateStatus.className = 'text-sm text-yellow-400';
+                if (this.updateBtn) this.updateBtn.classList.add('hidden');
+            } else if (updateInfo.hasUpdate) {
+                this.updateStatus.textContent = `Update available: v${updateInfo.latestVersion}`;
+                this.updateStatus.className = 'text-sm text-green-400';
+                if (this.updateBtn) {
+                    this.updateBtn.classList.remove('hidden');
+                    this.updateBtn.textContent = 'View Release';
+                }
+                this.availableUpdate = updateInfo; // Store for later use
+            } else {
+                this.updateStatus.textContent = 'You\'re using the latest version';
+                this.updateStatus.className = 'text-sm text-gray-400';
+                if (this.updateBtn) this.updateBtn.classList.add('hidden');
+            }
+        } catch (error) {
+            this.updateStatus.textContent = 'Check failed';
+            this.updateStatus.className = 'text-sm text-red-400';
+            if (this.updateBtn) this.updateBtn.classList.add('hidden');
+        } finally {
+            this.checkUpdateBtn.disabled = false;
+            this.checkUpdateBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+    }
+
+    showUpdateSummary() {
+        if (!this.availableUpdate || !this.modal) return;
+
+        const summary = this.updateService.formatUpdateSummary(this.availableUpdate);
+
+        this.modal.open('Update Available');
+        this.modal.setContent(summary);
+
+        // Add view release button to modal
+        const modalContent = this.modal.modalBody;
+        const updateAction = document.createElement('div');
+        updateAction.className = 'mt-6 flex justify-end space-x-3';
+        updateAction.innerHTML = `
+            <button id="cancelUpdate" class="px-4 py-2 text-sm font-medium rounded-md bg-gray-700 hover:bg-gray-600 text-white transition-colors">
+                Close
+            </button>
+            <button id="confirmUpdate" class="px-4 py-2 text-sm font-medium rounded-md bg-green-600 hover:bg-green-700 text-white transition-colors">
+                View Release on GitHub
+            </button>
+        `;
+        modalContent.appendChild(updateAction);
+
+        // Add event listeners
+        document.getElementById('cancelUpdate').addEventListener('click', () => {
+            this.modal.close();
+        });
+
+        document.getElementById('confirmUpdate').addEventListener('click', () => {
+            // Open release page in new tab
+            window.open(this.availableUpdate.releaseUrl, '_blank');
+        });
     }
 
     }

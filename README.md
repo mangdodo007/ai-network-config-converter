@@ -1,12 +1,15 @@
 # AI Network Configuration Translator
 
-A powerful web-based tool that translates network device configurations between different vendors using AI technology. Supports translation between Cisco, Juniper, Huawei, Aruba, and Arista network devices with intelligent vendor-specific OS filtering.
+A powerful web-based tool that translates network device configurations between different vendors using AI technology. Created by Lindo Prasetyo, this application supports translation between Cisco, Juniper, Huawei, Aruba, and Arista network devices with intelligent vendor-specific OS filtering.
 
 ## Features
 
 - **Multi-Vendor Support**: Translate configurations between Cisco (IOS/IOS-XE/IOS-XR/NX-OS), Juniper (Junos), Huawei (VRP), Aruba (AOS-CX/AOS), and Arista (EOS)
 - **Intelligent OS Filtering**: OS type options automatically filter based on selected vendor for accurate translations
-- **AI-Powered Analysis**: Get configuration explanations and generate test plans using Google's Gemini AI
+- **AI-Powered Analysis**: Get configuration explanations and generate test plans using Google's Gemini AI models
+- **Advanced Settings**: Choose between Gemini 2.5 Flash (fast) and Gemini 2.5 Pro (capable) models
+- **Custom Prompts**: Add documentation links and translation examples for enhanced accuracy
+- **Update Management**: Built-in GitHub update checking with simple manual update instructions
 - **Clean Interface**: Simple 3-step workflow with responsive design
 - **Code Formatting**: Preserves network configuration indentation and formatting
 
@@ -103,10 +106,43 @@ Edit `js/config.js` to configure your Gemini API settings:
 ```javascript
 export const config = {
     API_KEY: 'your-api-key-here', // Replace with your Gemini API key
-    API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent',
-    MODEL_NAME: 'gemini-2.5-flash-preview-09-2025'
+    // Available models configuration
+    MODELS: {
+        'gemini-2.5-pro': {
+            name: 'Gemini 2.5 Pro',
+            description: 'Most capable model for complex network translations and analysis',
+            url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent'
+        },
+        'gemini-2.5-flash': {
+            name: 'Gemini 2.5 Flash',
+            description: 'Fast and efficient model for quick network translations',
+            url: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
+        }
+    },
+    // Default model
+    DEFAULT_MODEL: 'gemini-2.5-flash'
 };
 ```
+
+### Advanced Settings
+
+#### Model Selection
+- **Gemini 2.5 Flash**: Fast and efficient for standard translations
+- **Gemini 2.5 Pro**: Most capable for complex configurations and analysis
+
+#### Custom Prompts
+Enhance translation accuracy by adding:
+- Documentation links and reference materials
+- Example translations and command mappings
+- Specific vendor formatting requirements
+- Special instructions for your environment
+
+### Update Configuration
+The application checks for updates from the GitHub repository:
+- **Current Version**: v1.1.0
+- **Update Check**: Manual checking with release notes display
+- **Update Process**: Simple 4-step manual instructions
+- **Public Repository**: Easy access without authentication needed
 
 ### Server Configuration
 The application runs on port 8000 by default. You can modify this in the server scripts:
@@ -126,6 +162,7 @@ network-config-converter/
 │   ├── app.js              # Main application logic
 │   ├── config.js           # API configuration
 │   ├── gemini-service.js   # Gemini API service
+│   ├── update-service.js   # GitHub update service
 │   ├── modal.js            # Modal dialog functionality
 │   ├── utils.js            # Utility functions
 │   └── main.js             # Application entry point
@@ -204,6 +241,19 @@ network-config-converter/
 This project is provided as-is for educational and professional use. Please respect the terms of service of all third-party services used.
 
 ## Changelog
+
+### v1.1.0 - Current Version
+- ✨ **New Features**:
+  - Added model selection between Gemini 2.5 Flash and Pro models
+  - Implemented custom prompt system for enhanced translation accuracy
+  - Built-in GitHub update checking with manual update guidance
+  - Added creator attribution in header
+  - Improved UI/UX with compact update section at bottom
+- 🔧 **Enhancements**:
+  - Better prompt hierarchy - custom prompts enhance base instructions
+  - Simplified 4-step manual update process
+  - Cleaner interface without confusing status messages
+  - Improved error handling and user feedback
 
 ### v1.0.0
 - Initial release with multi-vendor support
