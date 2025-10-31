@@ -5,13 +5,18 @@ import { Modal } from './modal.js';
 
 export class App {
     constructor() {
+        console.log('=== App Constructor Starting ===');
         this.initializeElements();
         this.modal = new Modal();
         this.setupEventListeners();
         this.lastTranslatedConfig = '';
+        console.log('=== App Constructor Complete ===');
     }
 
     initializeElements() {
+        console.log('Initializing elements...');
+
+        // Basic elements
         this.sourceConfigEl = document.getElementById('sourceConfig');
         this.sourceVendorEl = document.getElementById('sourceVendor');
         this.sourceOSTypeEl = document.getElementById('sourceOSType');
@@ -32,6 +37,21 @@ export class App {
         this.customPromptEl = document.getElementById('customPrompt');
         this.clearCustomPromptBtn = document.getElementById('clearCustomPrompt');
         this.customPromptLengthEl = document.getElementById('customPromptLength');
+
+        console.log('Elements initialized:', {
+            toggleAdvancedBtn: !!this.toggleAdvancedBtn,
+            advancedSettingsEl: !!this.advancedSettingsEl,
+            modelSelectionEl: !!this.modelSelectionEl,
+            modelDescriptionEl: !!this.modelDescriptionEl,
+            customPromptEl: !!this.customPromptEl,
+            clearCustomPromptBtn: !!this.clearCustomPromptBtn,
+            customPromptLengthEl: !!this.customPromptLengthEl
+        });
+
+        // Check if advanced settings are hidden by default
+        if (this.advancedSettingsEl) {
+            console.log('Advanced settings initially hidden:', this.advancedSettingsEl.classList.contains('hidden'));
+        }
     }
 
     setupEventListeners() {
@@ -454,4 +474,46 @@ For each part of the configuration, create a heading. Under each heading, list t
         this.customPromptEl.value = '';
         this.updateCustomPromptLength();
     }
+
+    // Manual test function - call from browser console: window.testApp()
+    static testFromConsole() {
+        console.log('=== Manual Test Started ===');
+
+        // Check if config is available
+        if (typeof config !== 'undefined') {
+            console.log('Config available:', !!config);
+            console.log('Models:', Object.keys(config.MODELS));
+        } else {
+            console.error('Config not available');
+        }
+
+        // Check if elements exist
+        const modelSelect = document.getElementById('modelSelection');
+        const advancedSettings = document.getElementById('advancedSettings');
+        const toggleBtn = document.getElementById('toggleAdvanced');
+
+        console.log('DOM Elements found:', {
+            modelSelect: !!modelSelect,
+            advancedSettings: !!advancedSettings,
+            toggleBtn: !!toggleBtn
+        });
+
+        if (modelSelect) {
+            console.log('Current options in modelSelect:', modelSelect.options.length);
+            console.log('Current value:', modelSelect.value);
+        }
+
+        if (toggleBtn) {
+            console.log('Toggle button found, trying to click...');
+            toggleBtn.click();
+            setTimeout(() => {
+                console.log('Advanced settings visible:', !advancedSettings.classList.contains('hidden'));
+            }, 100);
+        }
+
+        console.log('=== Manual Test Complete ===');
+    }
 }
+
+// Make test function available globally
+window.testApp = () => App.testFromConsole();
