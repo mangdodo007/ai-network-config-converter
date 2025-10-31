@@ -1,12 +1,21 @@
 @echo off
-REM AI Network Configuration Translator - Windows Startup Script
+REM AI Network Configuration Translator v1.1.0 - Windows Startup Script
+REM Created by Lindo Prasetyo
 REM This script starts a local web server and opens the application in your default browser
+REM Features: Multi-vendor network config translation with AI-powered analysis
 
 set PORT=8000
 set APP_URL=http://localhost:%PORT%
+set APP_VERSION=v1.1.0
 
-echo Starting AI Network Configuration Translator...
-echo Server will run on: %APP_URL%
+echo ============================================
+echo    AI Network Configuration Translator
+echo            Version %APP_VERSION%
+echo          Created by Lindo Prasetyo
+echo ============================================
+echo.
+echo Starting server...
+echo Application will be available at: %APP_URL%
 
 REM Check if Python is installed
 python --version >nul 2>&1
@@ -22,13 +31,14 @@ if %errorlevel% neq 0 (
 echo Python found:
 python --version
 
-REM Check if Flask is available (optional)
+REM Check if Flask is available (optional for advanced features)
 python -c "import flask" >nul 2>&1
 if %errorlevel% equ 0 (
     echo Flask available - you can use 'python server.py' for advanced features
+    echo Advanced features include: custom prompts, model selection, update checking
 ) else (
     echo Flask not found - using basic HTTP server
-    echo Install Flask with: pip install flask
+    echo To enable advanced features, install Flask: pip install flask
 )
 
 REM Check if the port is already in use
@@ -62,7 +72,15 @@ timeout /t 2 /nobreak >nul
 REM Open the browser
 start "" "%APP_URL%"
 
-echo Application started successfully!
+echo ============================================
+echo   Application started successfully!
+echo.
+echo Features Available:
+echo - Multi-vendor network translation (Cisco, Juniper, Huawei, Aruba, Arista)
+echo - AI-powered configuration analysis and explanations
+echo - Custom prompts and model selection (Gemini 2.5 Flash/Pro)
+echo - Built-in update checking and release notes
+echo.
 echo If browser didn't open automatically, navigate to: %APP_URL%
 echo.
 echo Press any key to stop the server...
@@ -70,5 +88,5 @@ pause >nul
 
 REM Stop the server
 taskkill /f /im python.exe >nul 2>&1
-echo Server stopped.
+echo Server stopped. Thank you for using AI Network Configuration Translator!
 timeout /t 2 /nobreak >nul
