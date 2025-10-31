@@ -6,17 +6,13 @@ import { config } from './config.js';
 
 export class App {
     constructor() {
-        console.log('=== App Constructor Starting ===');
         this.initializeElements();
         this.modal = new Modal();
         this.setupEventListeners();
         this.lastTranslatedConfig = '';
-        console.log('=== App Constructor Complete ===');
     }
 
     initializeElements() {
-        console.log('Initializing elements...');
-
         // Basic elements
         this.sourceConfigEl = document.getElementById('sourceConfig');
         this.sourceVendorEl = document.getElementById('sourceVendor');
@@ -38,21 +34,6 @@ export class App {
         this.customPromptEl = document.getElementById('customPrompt');
         this.clearCustomPromptBtn = document.getElementById('clearCustomPrompt');
         this.customPromptLengthEl = document.getElementById('customPromptLength');
-
-        console.log('Elements initialized:', {
-            toggleAdvancedBtn: !!this.toggleAdvancedBtn,
-            advancedSettingsEl: !!this.advancedSettingsEl,
-            modelSelectionEl: !!this.modelSelectionEl,
-            modelDescriptionEl: !!this.modelDescriptionEl,
-            customPromptEl: !!this.customPromptEl,
-            clearCustomPromptBtn: !!this.clearCustomPromptBtn,
-            customPromptLengthEl: !!this.customPromptLengthEl
-        });
-
-        // Check if advanced settings are hidden by default
-        if (this.advancedSettingsEl) {
-            console.log('Advanced settings initially hidden:', this.advancedSettingsEl.classList.contains('hidden'));
-        }
     }
 
     setupEventListeners() {
@@ -63,8 +44,6 @@ export class App {
         // Advanced settings event listeners
         if (this.toggleAdvancedBtn) {
             this.toggleAdvancedBtn.addEventListener('click', () => this.toggleAdvancedSettings());
-        } else {
-            console.error('Toggle advanced button not found');
         }
 
         if (this.modelSelectionEl) {
@@ -100,14 +79,6 @@ export class App {
         const selectedModel = this.modelSelectionEl.value;
         const customPrompt = this.customPromptEl.value.trim();
 
-        console.log('Translation started with:', {
-            sourceVendor,
-            targetVendor,
-            selectedModel,
-            customPromptLength: customPrompt.length,
-            sourceConfigLength: sourceConfig.length
-        });
-
         if (!sourceConfig) {
             this.outputContainer.innerHTML = '<span class="text-red-400">Please enter a source configuration.</span>';
             return;
@@ -119,18 +90,15 @@ export class App {
         this.translateButton.classList.add('opacity-50', 'cursor-not-allowed');
 
         try {
-            console.log('Building translation prompt...');
             const systemPrompt = this.buildTranslationPrompt(sourceVendor, sourceOSType, targetOSType, customPrompt);
             const userQuery = this.buildTranslationQuery(sourceConfig, sourceVendor, sourceOSType, targetVendor, targetOSType);
 
-            console.log('Calling AI with model:', selectedModel);
             const translatedConfig = await GeminiService.generateContent(systemPrompt, userQuery, selectedModel);
             const cleanedConfig = Utils.cleanApiResponse(translatedConfig);
             this.lastTranslatedConfig = cleanedConfig;
 
             this.outputContainer.textContent = cleanedConfig;
             this.aiFeaturesContainer.classList.remove('hidden');
-            console.log('Translation completed successfully');
         } catch (error) {
             console.error("Error during translation:", error);
             this.outputContainer.innerHTML = `<span class="text-red-400 text-center">An error occurred while communicating with the AI. <br> ${error.message}</span>`;
@@ -194,10 +162,9 @@ export class App {
         let customPromptSection = '';
         if (customPrompt) {
             customPromptSection = `\n\nAdditional Instructions: ${customPrompt}`;
-            console.log('Custom prompt included:', customPrompt.substring(0, 100) + '...');
         }
 
-        const fullPrompt = `You are 'Gem Network Expert Translate', a highly specialized AI agent. Your sole purpose is to translate network device configurations. You have expert-level knowledge of multi-vendor syntax, including Cisco IOS, IOS-XE, IOS-XR, NX-OS, Juniper (Junos), Huawei (VRP), Aruba (AOS-CX), and Arista (EOS).${contextInfo}${customPromptSection}
+        return `You are 'Gem Network Expert Translate', a highly specialized AI agent. Your sole purpose is to translate network device configurations. You have expert-level knowledge of multi-vendor syntax, including Cisco IOS, IOS-XE, IOS-XR, NX-OS, Juniper (Junos), Huawei (VRP), Aruba (AOS-CX), and Arista (EOS).${contextInfo}${customPromptSection}
 Core Directives:
 1. Analyze the source configuration and any corrective feedback provided by the user.
 2. Translate the configuration into the target vendor's syntax with extreme accuracy.
@@ -229,9 +196,6 @@ Core Directives:
      set interfaces ge-0/0/1 unit 0 family ethernet-switching port-mode trunk
      set interfaces ge-0/0/1 unit 0 family ethernet-switching vlan members [10 20 30]
 5. If a direct translation is impossible, embed a clear, concise comment within the code (e.g., "# [INFO] Manual configuration required for this feature").`;
-
-        console.log('Translation prompt built, custom prompt length:', customPrompt.length);
-        return fullPrompt;
     }
 
     buildExplanationPrompt(customPrompt = '') {
@@ -373,77 +337,53 @@ For each part of the configuration, create a heading. Under each heading, list t
 
     // Advanced Settings Methods
     initializeAdvancedSettings() {
-        console.log('Initializing advanced settings...');
-        console.log('Elements found:', {
-            modelSelection: !!this.modelSelectionEl,
-            customPrompt: !!this.customPromptEl,
-            advancedSettings: !!this.advancedSettingsEl
-        });
-
         this.populateModelSelection();
         this.updateModelDescription();
         this.updateCustomPromptLength();
-
-        console.log('Advanced settings initialized');
     }
 
     toggleAdvancedSettings() {
-        console.log('Toggle advanced settings clicked');
-
         if (!this.advancedSettingsEl) {
-            console.error('Advanced settings element not found');
             return;
         }
 
         const isHidden = this.advancedSettingsEl.classList.contains('hidden');
-        console.log('Current state - hidden:', isHidden);
 
         if (isHidden) {
             this.advancedSettingsEl.classList.remove('hidden');
             this.advancedToggleTextEl.textContent = 'Hide';
             this.toggleAdvancedBtn.innerHTML = '<span class="mr-1">▲</span>Hide';
-            console.log('Showing advanced settings');
         } else {
             this.advancedSettingsEl.classList.add('hidden');
             this.advancedToggleTextEl.textContent = 'Show';
             this.toggleAdvancedBtn.innerHTML = '<span class="mr-1">▼</span>Show';
-            console.log('Hiding advanced settings');
         }
     }
 
     populateModelSelection() {
-        console.log('=== POPULATING MODEL SELECTION ===');
-
         if (!this.modelSelectionEl) {
-            console.error('Model selection element not found');
             return;
         }
 
-        // First try: Use service method
+        // Use service method
         try {
             const models = GeminiService.getAvailableModels();
-            console.log('Models from service:', models);
-
             if (models && models.length > 0) {
                 this.populateModelsFromList(models);
                 return;
             }
         } catch (error) {
-            console.error('Error getting models from service:', error);
+            // Fallback to manual creation
         }
 
         // Fallback: Manually create models from config
-        console.log('Using fallback manual model creation...');
         this.populateModelsManually();
     }
 
     populateModelsFromList(models) {
-        console.log('Populating from list:', models);
-
         this.modelSelectionEl.innerHTML = '';
 
-        models.forEach((model, index) => {
-            console.log(`Adding model ${index}:`, model);
+        models.forEach((model) => {
             const option = document.createElement('option');
             option.value = model.id;
             option.textContent = model.name;
@@ -452,15 +392,9 @@ For each part of the configuration, create a heading. Under each heading, list t
             }
             this.modelSelectionEl.appendChild(option);
         });
-
-        console.log('Model selection populated with', models.length, 'models');
-        console.log('Current options count:', this.modelSelectionEl.options.length);
-        console.log('Selected value:', this.modelSelectionEl.value);
     }
 
     populateModelsManually() {
-        console.log('Manual population starting...');
-
         this.modelSelectionEl.innerHTML = '';
 
         // Manual model definitions - Gemini 2.5 models
@@ -469,26 +403,15 @@ For each part of the configuration, create a heading. Under each heading, list t
             { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro - Most Capable' }
         ];
 
-        manualModels.forEach((model, index) => {
-            console.log(`Adding manual model ${index}:`, model);
+        manualModels.forEach((model) => {
             const option = document.createElement('option');
             option.value = model.id;
             option.textContent = model.name;
             if (model.id === config.DEFAULT_MODEL) {
                 option.selected = true;
-                console.log('Set as default:', model.id);
             }
             this.modelSelectionEl.appendChild(option);
         });
-
-        console.log('Manual population complete');
-        console.log('Final options count:', this.modelSelectionEl.options.length);
-        console.log('Final selected value:', this.modelSelectionEl.value);
-
-        // Verify the options
-        for (let i = 0; i < this.modelSelectionEl.options.length; i++) {
-            console.log(`Option ${i}:`, this.modelSelectionEl.options[i].value, this.modelSelectionEl.options[i].textContent);
-        }
     }
 
     updateModelDescription() {
@@ -523,57 +446,4 @@ For each part of the configuration, create a heading. Under each heading, list t
         this.updateCustomPromptLength();
     }
 
-    // Manual test function - call from browser console: window.testApp()
-    static testFromConsole() {
-        console.log('=== Manual Test Started ===');
-
-        // Check if config is available
-        if (typeof config !== 'undefined') {
-            console.log('Config available:', !!config);
-            console.log('Models:', Object.keys(config.MODELS));
-        } else {
-            console.error('Config not available');
-        }
-
-        // Check if elements exist
-        const modelSelect = document.getElementById('modelSelection');
-        const advancedSettings = document.getElementById('advancedSettings');
-        const toggleBtn = document.getElementById('toggleAdvanced');
-
-        console.log('DOM Elements found:', {
-            modelSelect: !!modelSelect,
-            advancedSettings: !!advancedSettings,
-            toggleBtn: !!toggleBtn
-        });
-
-        if (modelSelect) {
-            console.log('Current options in modelSelect:', modelSelect.options.length);
-            console.log('Current value:', modelSelect.value);
-        }
-
-        if (toggleBtn) {
-            console.log('Toggle button found, trying to click...');
-            toggleBtn.click();
-            setTimeout(() => {
-                console.log('Advanced settings visible:', !advancedSettings.classList.contains('hidden'));
-            }, 100);
-        }
-
-        console.log('=== Manual Test Complete ===');
     }
-}
-
-// Make test function available globally
-window.testApp = () => App.testFromConsole();
-
-// Manual model population function - call from browser console: window.populateModels()
-window.populateModels = () => {
-    const modelSelect = document.getElementById('modelSelection');
-    if (modelSelect) {
-        console.log('Manual model population called');
-        const app = new App();
-        app.populateModelSelection();
-    } else {
-        console.error('Model selection element not found');
-    }
-};

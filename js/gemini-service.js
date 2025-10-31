@@ -50,7 +50,6 @@ export class GeminiService {
             description: model.description
         }));
 
-        console.log('Available models from config:', models);
         return models;
     }
 
