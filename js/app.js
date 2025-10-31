@@ -335,11 +335,11 @@ For each part of the configuration, create a heading. Under each heading, list t
         if (isHidden) {
             this.advancedSettingsEl.classList.remove('hidden');
             this.advancedToggleTextEl.textContent = 'Hide';
-            this.toggleAdvancedBtn.innerHTML = '<span class="mr-1">▲</span><span id="advancedToggleText">Hide</span>';
+            this.toggleAdvancedBtn.innerHTML = '<span class="mr-1">▲</span>Hide';
         } else {
             this.advancedSettingsEl.classList.add('hidden');
             this.advancedToggleTextEl.textContent = 'Show';
-            this.toggleAdvancedBtn.innerHTML = '<span class="mr-1">▼</span><span id="advancedToggleText">Show</span>';
+            this.toggleAdvancedBtn.innerHTML = '<span class="mr-1">▼</span>Show';
         }
     }
 
