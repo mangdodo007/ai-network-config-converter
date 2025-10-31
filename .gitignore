@@ -1,0 +1,117 @@
+# AI Network Configuration Translator - .gitignore
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor and IDE Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# Temporary Files
+*.tmp
+*.temp
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# Python Files (if using Python server)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Node.js Files (if using npm for development)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build and Distribution Files
+build/
+dist/
+out/
+
+# Cache Directories
+.cache/
+.parcel-cache/
+.eslintcache
+
+# Coverage Reports
+coverage/
+*.lcov
+
+# Dependency Directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Output and Log Files
+output/
+logs/
+*.out
+
+# API Keys and Sensitive Configuration
+# (Note: Be careful with config.js as it contains API keys)
+config.local.js
+secrets.json
+
+# Backup Files
+*.bak
+*.backup
+*.old
+
+# Test Files
+test-results/
+coverage/
+
+# Documentation Build
+docs/_build/
+docs/.doctrees/
+
+# IDE workspace files
+*.code-workspace
+*.sublime-workspace
+
+# Local development files
+.local/
+tmp/
+temp/

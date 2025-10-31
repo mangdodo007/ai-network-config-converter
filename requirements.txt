@@ -1,0 +1,8 @@
+# AI Network Configuration Translator - Python Requirements
+# Only required if using the Python Flask server (server.py)
+
+# Flask web framework for the optional Python server
+Flask==3.0.0
+
+# For automatic browser opening (usually comes with Python)
+# webbrowser  # Built-in module, no installation needed
