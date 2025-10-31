@@ -463,16 +463,10 @@ For each part of the configuration, create a heading. Under each heading, list t
 
         this.modelSelectionEl.innerHTML = '';
 
-        // Manual model definitions - Latest models
+        // Manual model definitions - Gemini 2.5 models
         const manualModels = [
-            { id: 'gemini-1.5-flash-002', name: 'Gemini 1.5 Flash (002) - Recommended' },
-            { id: 'gemini-1.5-pro-002', name: 'Gemini 1.5 Pro (002) - Latest Stable' },
-            { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro - Most Capable' },
-            { id: 'gemini-1.5-pro-experimental', name: 'Gemini 1.5 Pro (Experimental)' },
-            { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash - Fast & Efficient' },
-            { id: 'gemini-1.5-flash-8b', name: 'Gemini 1.5 Flash (8B) - Ultra-Fast' },
-            { id: 'gemini-exp-1206', name: 'Gemini Experimental (1206) - Latest' },
-            { id: 'gemini-exp-1121', name: 'Gemini Experimental (1121)' }
+            { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash - Fast & Efficient' },
+            { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro - Most Capable' }
         ];
 
         manualModels.forEach((model, index) => {
