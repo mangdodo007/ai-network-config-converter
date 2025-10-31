@@ -163,32 +163,31 @@ export class App {
         let priorityInstructions = '';
 
         if (customPrompt) {
-            // Make custom prompt more prominent and put it first
+            // Make custom prompt prominent but as enhancement to base instructions
             customPromptSection = `
-## CUSTOM INSTRUCTIONS - PRIORITY #1
+## ADDITIONAL INSTRUCTIONS
 ${customPrompt}
 
-⚠️ IMPORTANT: The custom instructions above MUST be followed EXACTLY. They override any standard rules if there are conflicts. Pay special attention to:
+💡 IMPORTANT: These instructions enhance the base requirements below. Please follow the base guidelines while incorporating these specific requirements:
 - Documentation links provided
 - Example translations shown
 - Specific formatting requirements mentioned
 - Any vendor-specific nuances highlighted`;
         }
 
-        return `You are 'Gem Network Expert Translate', a highly specialized AI agent. Your sole purpose is to translate network device configurations using the provided custom instructions with highest priority.
+        return `You are 'Gem Network Expert Translate', a highly specialized AI agent. Your sole purpose is to translate network device configurations.
 
 ${customPromptSection}
 
-## BASE INSTRUCTIONS - PRIORITY #2 (Follow only if custom instructions don't specify)
+## BASE INSTRUCTIONS
 You have expert-level knowledge of multi-vendor syntax, including Cisco IOS, IOS-XE, IOS-XR, NX-OS, Juniper (Junos), Huawei (VRP), Aruba (AOS-CX), and Arista (EOS).${contextInfo}
 
 Core Directives:
-1. **FIRST PRIORITY**: Follow all custom instructions exactly as specified above.
-2. **SECOND PRIORITY**: If custom instructions don't cover something, use these standard rules:
-   - Analyze the source configuration and any corrective feedback provided by the user.
-   - Translate the configuration into the target vendor's syntax with extreme accuracy.
-3. **Critical Output Format**: Your response MUST BE ONLY the translated configuration code. Do not include any explanatory text, greetings, or markdown formatting like \`\`\`. The output must be pure, ready-to-use configuration code.
-4. **Critical Formatting Requirements**: Follow custom instructions first, then these standard rules for each vendor:
+1. Follow the base guidelines below while incorporating any additional instructions provided above.
+2. Analyze the source configuration and any corrective feedback provided by the user.
+3. Translate the configuration into the target vendor's syntax with extreme accuracy.
+4. **Critical Output Format**: Your response MUST BE ONLY the translated configuration code. Do not include any explanatory text, greetings, or markdown formatting like \`\`\`. The output must be pure, ready-to-use configuration code.
+5. **Critical Formatting Requirements**: Follow these exact formatting rules for each vendor:
    - **Cisco IOS/IOS-XE/NX-OS**: Use 1 space indentation for sub-commands under parent commands. Example format:
      interface Ethernet1/1
       description Uplink
@@ -214,24 +213,24 @@ Core Directives:
      set interfaces ge-0/0/1 description "Uplink"
      set interfaces ge-0/0/1 unit 0 family ethernet-switching port-mode trunk
      set interfaces ge-0/0/1 unit 0 family ethernet-switching vlan members [10 20 30]
-5. If a direct translation is impossible, embed a clear, concise comment within the code (e.g., "# [INFO] Manual configuration required for this feature").`;
+6. If a direct translation is impossible, embed a clear, concise comment within the code (e.g., "# [INFO] Manual configuration required for this feature").`;
     }
 
     buildExplanationPrompt(customPrompt = '') {
         let customPromptSection = '';
         if (customPrompt) {
             customPromptSection = `
-## CUSTOM INSTRUCTIONS - PRIORITY #1
+## ADDITIONAL CONTEXT
 ${customPrompt}
 
-⚠️ IMPORTANT: The custom instructions above MUST be followed EXACTLY. They override any standard rules if there are conflicts.`;
+💡 IMPORTANT: Please incorporate this additional context while following the base guidelines below.`;
         }
 
         return `You are a senior network engineer and trainer. Your task is to provide a clear, step-by-step explanation for a given network configuration.
 
 ${customPromptSection}
 
-## BASE INSTRUCTIONS - PRIORITY #2 (Follow only if custom instructions don't specify)
+## BASE GUIDELINES
 **Format your entire response using Markdown.** Use headings (e.g., '## Interface Configuration'), bullet points for explanations, and backticks for inline code (e.g., \`vlan 10\`) or triple backticks with a language specifier for code blocks.`;
     }
 
@@ -239,17 +238,17 @@ ${customPromptSection}
         let customPromptSection = '';
         if (customPrompt) {
             customPromptSection = `
-## CUSTOM INSTRUCTIONS - PRIORITY #1
+## ADDITIONAL REQUIREMENTS
 ${customPrompt}
 
-⚠️ IMPORTANT: The custom instructions above MUST be followed EXACTLY. They override any standard rules if there are conflicts.`;
+💡 IMPORTANT: Please incorporate these additional requirements while following the base guidelines below.`;
         }
 
         return `You are a network automation engineer specializing in quality assurance. Your task is to create a concise but effective test plan to verify a network configuration.
 
 ${customPromptSection}
 
-## BASE INSTRUCTIONS - PRIORITY #2 (Follow only if custom instructions don't specify)
+## BASE GUIDELINES
 **Format the entire response using Markdown, including tables for verification commands.**
 For each part of the configuration, create a heading. Under each heading, list the specific verification commands (e.g., 'show' commands) and describe the expected output in a table to confirm success.`;
     }
