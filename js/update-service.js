@@ -104,7 +104,6 @@ ${updateInfo.releaseNotes || 'No release notes available.'}
 
 **🔗 Quick Links:**
 - [View Release on GitHub](${updateInfo.releaseUrl})
-- [Download ZIP File](${updateInfo.downloadUrl})
 - [Repository Homepage](${this.githubUrl})
         `.trim();
     }
